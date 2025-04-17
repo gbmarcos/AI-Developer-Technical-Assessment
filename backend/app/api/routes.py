@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.endpoints import books, hackernews, init
+from .endpoints import books, hackernews, init
 
 router = APIRouter()
 router.include_router(init.router, prefix="/init", tags=["Init"])
