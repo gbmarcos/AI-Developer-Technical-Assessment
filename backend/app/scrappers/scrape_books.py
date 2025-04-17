@@ -11,9 +11,6 @@ import time
 # Configuración de logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Conexión a Redis en la nube (Aiven)
-# redis_url = "rediss://default:AVNS_05w3I6Siz3Rurpv_sSa@valkey-e6bd75d-montesdeocaroblesm-6810.f.aivencloud.com:26787"
-# r = redis.Redis.from_url(redis_url, decode_responses=True)
 
 BASE_URL = "https://books.toscrape.com/catalogue/page-{}.html"
 BOOK_BASE_URL = "https://books.toscrape.com/catalogue/"
