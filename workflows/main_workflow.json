@@ -1,0 +1,556 @@
+{
+  "name": "ai agent",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$('Webhook').item.binary.audio}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "7e752359-a798-43ef-a141-f6fbfbcbfef0"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ed8bb56a-a266-453d-a8cf-24efbfa620e0",
+                    "leftValue": "={{ $json.body.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -180,
+        -950
+      ],
+      "id": "348c8fc4-ea3c-48e5-bff0-9c6af9ee1609",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        -580
+      ],
+      "id": "5780a38d-678e-4d2e-a83f-c295d9a13f76",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "cEvCJoz4RLm4kjZG",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Fetches book info (title, price, description, image) using a search query.",
+        "url": "http://recruiter-dev-backend:7013/books/search",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "query",
+              "valueProvider": "modelOptional"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1260,
+        -580
+      ],
+      "id": "d2536d69-524d-4d93-b848-1d603280ece1",
+      "name": "Books Search Tool"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Fetches the latest news from Hacker News.",
+        "url": "http://recruiter-dev-backend:7013/headlines"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1380,
+        -580
+      ],
+      "id": "823dbbd0-c9fd-4319-9014-842bf45da1aa",
+      "name": "Headlines Tool"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "={\n  \"role\": \"You are a smart AI assistant that helps users find information about books and Hacker News headlines. Only respond to those topics and use tools to answer.\",\n  \"tools\": [\n    {\n      \"name\": \"Books Search Tool\",\n      \"description\": \"Finds books by title, price, or description.\",\n      \"input\": \"query (English keyword)\",\n      \"usage\": \"Use when the user asks about books or reading. Extract a keyword (even from misspellings or other languages), translate it to English, and call the tool.\"\n    },\n    {\n      \"name\": \"Headlines Tool\",\n      \"description\": \"Shows latest Hacker News headlines.\",\n      \"usage\": \"Use when the user asks about Hacker News or similar terms (e.g., 'hackr ne').\"\n    }\n  ],\n  \"instructions\": [\n    \"Ignore other topics and remind user you're for books and Hacker News only.\",\n    \"Handle typos or spelling mistakes.\",\n    \"Use the same language as the user with a friendly, light tone.\"\n  ]\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1172,
+        -800
+      ],
+      "id": "aa90af40-abc9-4b89-befa-cf4bb85a47f4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1580,
+        -800
+      ],
+      "id": "55d64ed1-4964-43e5-8d91-cab129428203",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ask",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -950
+      ],
+      "id": "47d9cde7-c48c-439a-a046-3569f59abdcc",
+      "name": "Webhook",
+      "webhookId": "49e76eaf-62bc-477e-bd57-786563648464"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "44bba929-86e4-44fc-97a3-f26b229ae859",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a9107c14-fc36-417a-9776-51da3c31e78f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        920,
+        -1175
+      ],
+      "id": "59529fb6-ee78-4a7b-bb91-91151dee20bc",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "audio",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        -1100
+      ],
+      "id": "4025631d-659a-4919-b767-d360a578575a",
+      "name": "upload file1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vrOiO7YvesxtHRVJ",
+          "name": "Assembly Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/transcript",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_url",
+              "value": "={{ $json.upload_url }}"
+            },
+            {
+              "name": "language_code",
+              "value": "es"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        -1100
+      ],
+      "id": "b5d09db6-8c1b-42e3-aa0e-ca77f5ad6768",
+      "name": "Start transcription1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "cEvCJoz4RLm4kjZG",
+          "name": "DeepSeek account"
+        },
+        "httpHeaderAuth": {
+          "id": "vrOiO7YvesxtHRVJ",
+          "name": "Assembly Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        -1100
+      ],
+      "id": "2a041342-520f-488d-8a8d-0a1e563f3ed1",
+      "name": "Wait 2 seconds1",
+      "webhookId": "59404d90-83b0-4c7e-ba7d-b580af4883a4"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1250,
+        -1100
+      ],
+      "id": "96dcecc3-ee54-4947-aaac-39d0178ed3f8",
+      "name": "retry 10 times1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.assemblyai.com/v2/transcript/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        -1175
+      ],
+      "id": "12fea2cb-4eb1-4861-9db2-854fd27e0417",
+      "name": "Request trascription1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vrOiO7YvesxtHRVJ",
+          "name": "Assembly Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "No se pudo procesar el audio"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        -1100
+      ],
+      "id": "91eebcbe-66ac-4a1b-8df7-548109628986",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Debes pasar un texto o audio"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        60,
+        -800
+      ],
+      "id": "43c00d1e-f4b1-4b32-9412-f78edf591936",
+      "name": "text or audio required"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "upload file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "text or audio required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Books Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Headlines Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retry 10 times1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload file1": {
+      "main": [
+        [
+          {
+            "node": "Start transcription1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start transcription1": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 seconds1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2 seconds1": {
+      "main": [
+        [
+          {
+            "node": "Request trascription1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retry 10 times1": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 2 seconds1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request trascription1": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v0",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "M5s4CzI6hwYqSf01"
+  },
+  "versionId": "8839c6e4-5f7c-439b-9ae3-9ec6aaf6f5ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9954e060a424edeb1229c867e40f8a927a0a96554959649a66c4c5b1d778fd20"
+  },
+  "id": "M5s4CzI6hwYqSf01",
+  "tags": []
+}

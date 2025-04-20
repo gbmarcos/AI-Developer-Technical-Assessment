@@ -59,10 +59,9 @@ services:
       - N8N_BASIC_AUTH_PASSWORD=admin
       - N8N_HOST=n8n
       - N8N_PORT=5678
-      - REDIS_HOST=redis
+      - REDIS_HOST=recruiter-dev-redis
       - REDIS_PORT=6379
       - N8N_SECURE_COOKIE=false
-      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true 
     volumes:
       - n8n_data:/home/node/.n8n
       - ./workflows:/data

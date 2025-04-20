@@ -9,15 +9,15 @@ router = APIRouter()
 
 
 
-@router.post("/search", response_model=list[dict])
-async def search_books(body: SearchRequest):
+@router.get("/search", response_model=list[Book])
+async def search_books(query: str = ""):
     books = []
     try:
         for key in r.scan_iter("book:*"):
             data = json.loads(r.get(key))
             if (
-                body.query.lower() in data["title"].lower()
-                or body.query.lower() == data["category"].lower()
+                query.lower() in data["title"].lower()
+                or query.lower() == data["category"].lower()
             ):
                 books.append(data)
         return books
