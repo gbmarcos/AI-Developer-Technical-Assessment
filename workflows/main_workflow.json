@@ -62,7 +62,7 @@
       "typeVersion": 3.2,
       "position": [
         -180,
-        -950
+        -675
       ],
       "id": "348c8fc4-ea3c-48e5-bff0-9c6af9ee1609",
       "name": "Switch"
@@ -81,7 +81,7 @@
       "name": "DeepSeek Chat Model",
       "credentials": {
         "deepSeekApi": {
-          "id": "cEvCJoz4RLm4kjZG",
+          "id": "G6uyLmjc0ASX6w30",
           "name": "DeepSeek account"
         }
       }
@@ -166,7 +166,7 @@
       "typeVersion": 2,
       "position": [
         -400,
-        -950
+        -675
       ],
       "id": "47d9cde7-c48c-439a-a046-3569f59abdcc",
       "name": "Webhook",
@@ -255,8 +255,8 @@
       "name": "upload file1",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "vrOiO7YvesxtHRVJ",
-          "name": "Assembly Credentials"
+          "id": "x8lwanUpS0l0apjD",
+          "name": "Header Auth account"
         }
       }
     },
@@ -291,12 +291,12 @@
       "name": "Start transcription1",
       "credentials": {
         "deepSeekApi": {
-          "id": "cEvCJoz4RLm4kjZG",
+          "id": "G6uyLmjc0ASX6w30",
           "name": "DeepSeek account"
         },
         "httpHeaderAuth": {
-          "id": "vrOiO7YvesxtHRVJ",
-          "name": "Assembly Credentials"
+          "id": "x8lwanUpS0l0apjD",
+          "name": "Header Auth account"
         }
       }
     },
@@ -345,8 +345,8 @@
       "name": "Request trascription1",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "vrOiO7YvesxtHRVJ",
-          "name": "Assembly Credentials"
+          "id": "x8lwanUpS0l0apjD",
+          "name": "Assembly Credential"
         }
       }
     },
@@ -370,11 +370,34 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        60,
-        -800
+        40,
+        -525
       ],
       "id": "43c00d1e-f4b1-4b32-9412-f78edf591936",
       "name": "text or audio required"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "15df932f-4a68-4440-922f-56a0d6357870",
+              "name": "text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        920,
+        -675
+      ],
+      "id": "37ebe5a9-9fcf-4aa4-9628-726dc560d37d",
+      "name": "field conversion"
     }
   ],
   "pinData": {},
@@ -390,7 +413,7 @@
         ],
         [
           {
-            "node": "AI Agent",
+            "node": "field conversion",
             "type": "main",
             "index": 0
           }
@@ -538,6 +561,17 @@
           }
         ]
       ]
+    },
+    "field conversion": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -546,10 +580,10 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "M5s4CzI6hwYqSf01"
   },
-  "versionId": "8839c6e4-5f7c-439b-9ae3-9ec6aaf6f5ba",
+  "versionId": "13cce2cc-ad6e-42e2-a2e7-a634b29d76de",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "9954e060a424edeb1229c867e40f8a927a0a96554959649a66c4c5b1d778fd20"
+    "instanceId": "e03ea6ff8c6317467de457c640530f91278abc939a03179cf782ab09eb17a436"
   },
   "id": "M5s4CzI6hwYqSf01",
   "tags": []

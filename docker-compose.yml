@@ -30,11 +30,25 @@ services:
       - ./backend:/app
     depends_on:
       - redis
+      - selenium
     environment:
       - REDIS_HOST=recruiter-dev-redis
       - REDIS_PORT=6379
       - REMOTE_DRIVER_URL=recruiter-dev-selenium
 
+
+  frontend:
+    build: ./frontend
+    container_name: recruiter-dev-frontend
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - ngrok
+    ports:
+      - "9000"
+    environment:
+      - NGROK_API_URL=http://ngrok:4040/api/tunnels
+    
   # frontend:
   #   build:
   #     context: ./frontend
@@ -45,6 +59,18 @@ services:
   #     - ./frontend:/app
   #   depends_on:
   #     - n8n
+
+  ngrok:
+    image: ngrok/ngrok
+    depends_on:
+      - n8n
+    container_name: recruiter-dev-ngrok
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
+    command:  http n8n:5678 --log=stdout
+    ports:
+      - "4040:4040"
+    
 
   n8n:
     build:
@@ -66,7 +92,7 @@ services:
       - n8n_data:/home/node/.n8n
       - ./workflows:/data
     depends_on:
-      - redis
+      - backend
 
 volumes:
   redis_data:

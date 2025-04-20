@@ -1,0 +1,1 @@
+ /app/app/.dart_tool/flutter_gen/gen_l10n/app_localizations_en.dart /app/app/.dart_tool/flutter_gen/gen_l10n/app_localizations_es.dart /app/app/.dart_tool/flutter_gen/gen_l10n/app_localizations.dart:  /app/app/l10n.yaml /app/app/lib/l10n/arb/app_en.arb /app/app/lib/l10n/arb/app_es.arb

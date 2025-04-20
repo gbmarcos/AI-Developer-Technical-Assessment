@@ -1,8 +1,16 @@
-FROM node:18
+FROM instrumentisto/flutter:3.27.1
 
 WORKDIR /app
-COPY package.json ./
-RUN npm install
+COPY app/pubspec.yaml .
+RUN flutter pub get
+
 COPY . .
 
-CMD ["npm", "run", "dev"]
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl jq python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
