@@ -7,8 +7,12 @@ RUN flutter pub get
 COPY . .
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl jq python3 && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    net-tools \
+    curl \
+    jq \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

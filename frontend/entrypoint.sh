@@ -13,10 +13,10 @@ PUBLIC_URL=$(curl -s $NGROK_API_URL | jq -r '.tunnels[] | select(.proto == "http
 
 # Construir aplicación Flutter
 
-echo "Construyendo con WEBHOOK_URL: ${PUBLIC_URL}/ask"
+echo "Construyendo con WEBHOOK_URL: ${PUBLIC_URL}/webhook/ask"
 cd app && flutter build web \
   --target lib/main_production.dart \
-  --dart-define=WEBHOOK_URL=${PUBLIC_URL}/ask \
+  --dart-define=WEBHOOK_URL=${PUBLIC_URL}/webhook/ask \
   --release
 
 
@@ -38,5 +38,5 @@ cd build/web/
 
 # Start the web server on the specified port
 echo "Starting the server on port $PORT..."
-python3 -m http.server $PORT
+python3 -m http.server $PORT --bind 0.0.0.0
 

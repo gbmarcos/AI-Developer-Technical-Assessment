@@ -6,6 +6,8 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+        - main-internal-net
 
   selenium:
     image: selenium/standalone-chrome:latest
@@ -18,6 +20,8 @@ services:
       - SE_LOG_LEVEL=INFO
     restart: always
     shm_size: 4gb
+    networks:
+        - main-internal-net
 
   backend:
     build:
@@ -35,6 +39,8 @@ services:
       - REDIS_HOST=recruiter-dev-redis
       - REDIS_PORT=6379
       - REMOTE_DRIVER_URL=recruiter-dev-selenium
+    networks:
+        - main-internal-net
 
 
   frontend:
@@ -45,20 +51,12 @@ services:
     depends_on:
       - ngrok
     ports:
-      - "9000"
+      - "8080:9000"
     environment:
       - NGROK_API_URL=http://ngrok:4040/api/tunnels
+    networks:
+        - main-internal-net
     
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   container_name: recruiter-dev-frontend
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app
-  #   depends_on:
-  #     - n8n
 
   ngrok:
     image: ngrok/ngrok
@@ -70,6 +68,8 @@ services:
     command:  http n8n:5678 --log=stdout
     ports:
       - "4040:4040"
+    networks:
+        - main-internal-net
     
 
   n8n:
@@ -85,6 +85,7 @@ services:
       - N8N_BASIC_AUTH_PASSWORD=admin
       - N8N_HOST=n8n
       - N8N_PORT=5678
+      - N8N_ENCRYPTION_KEY=n8necryptionkey
       - REDIS_HOST=recruiter-dev-redis
       - REDIS_PORT=6379
       - N8N_SECURE_COOKIE=false
@@ -93,7 +94,13 @@ services:
       - ./workflows:/data
     depends_on:
       - backend
+    networks:
+        - main-internal-net
 
 volumes:
   redis_data:
   n8n_data:
+  
+networks:
+  main-internal-net:
+    driver: bridge

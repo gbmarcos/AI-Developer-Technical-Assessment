@@ -21,7 +21,9 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
   final _chatController = ChatMessagesController();
 
   late final WaveformRecorderController _waveController =
-      WaveformRecorderController();
+      WaveformRecorderController(
+    config: const RecordConfig(encoder: AudioEncoder.wav),
+  );
 
   // User definitions with avatars
   final _currentUser = const ChatUser(
@@ -367,7 +369,8 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                                                     // Generate response with delay
                                                     final response =
                                                         await askBot(
-                                                      null,file.path,
+                                                      null,
+                                                      await file.readAsBytes(),
                                                     ).onError(
                                                       (error, stackTrace) {
                                                         throw Exception(error);
