@@ -6,6 +6,6 @@ router = APIRouter()
 @router.get("/")
 async def hacker_news():
     try:
-        return {"headlines": fetch_hacker_news_top_stories()}
+        return {"headlines": fetch_hacker_news_top_stories(2)}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error obteniendo noticias: " + str(e))

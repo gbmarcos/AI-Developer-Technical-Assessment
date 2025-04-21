@@ -1,9 +1,0 @@
-{
-  "name": "Interaction-WorkFlow",
-  "credentials": {
-    "huggingFaceApi": {
-      "id": "1",
-      "name": "HuggingFace API"
-    }
-  }
-}

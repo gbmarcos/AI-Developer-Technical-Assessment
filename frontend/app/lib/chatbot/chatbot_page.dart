@@ -1,4 +1,3 @@
-import 'package:dash_chat_2/dash_chat_2.dart' as dc2;
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -28,13 +27,13 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
   // User definitions with avatars
   final _currentUser = const ChatUser(
     id: 'user123',
-    firstName: 'You',
+    firstName: 'Tú',
     avatar: 'https://ui-avatars.com/api/?name=User&background=6366f1&color=fff',
   );
 
   final _aiUser = const ChatUser(
     id: 'ai123',
-    firstName: 'Insight AI',
+    firstName: 'Print AI',
     avatar: 'https://ui-avatars.com/api/?name=AI&background=10b981&color=fff',
   );
 
@@ -48,24 +47,6 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
   @override
   void initState() {
     super.initState();
-
-    _chatController.addMessage(
-      ChatMessage(
-        text: 'test',
-        user: _aiUser,
-        createdAt: DateTime.now(),
-        isMarkdown: true,
-      ),
-    );
-
-    _chatController.addMessage(
-      ChatMessage(
-        text: 'test',
-        user: _currentUser,
-        createdAt: DateTime.now(),
-        isMarkdown: true,
-      ),
-    );
 
     // Set up the chat controller to use our scroll controller
     _chatController.setScrollController(_scrollController);
@@ -82,6 +63,7 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
 
   /// Handle sending a message with support for streaming
   Future<void> _handleSendMessage(ChatMessage message) async {
+    if (_isGenerating) return;
     // Add the user's message to the chat
     _chatController.addMessage(message);
 
@@ -110,6 +92,78 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
     } finally {
       setState(() => _isGenerating = false);
     }
+  }
+
+  Future<void> _handleAudioMessage(BuildContext context) async {
+    if (_waveController.isRecording || _isGenerating) return;
+    await _waveController.startRecording();
+    showBottomSheet(
+      context: context,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(),
+      constraints: const BoxConstraints(),
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: _waveController,
+          builder: (context, child) {
+            if (_waveController.isRecording) {
+              return CustomRecorder(
+                waveController: _waveController,
+                onRecordStopped: () async {
+                  final file = _waveController.file;
+
+                  if (file != null) {
+                    _chatController.addMessage(
+                      ChatMessage(
+                        text: '*Audio*',
+                        isMarkdown: true,
+                        user: _currentUser,
+                        createdAt: DateTime.now(),
+                        media: [
+                          ChatMedia(
+                            url: file.path,
+                            type: ChatMediaType.audio,
+                          )
+                        ],
+                      ),
+                    );
+
+// Non-streaming approach with loading indicator
+                    setState(() => _isGenerating = true);
+
+                    try {
+                      // Generate response with delay
+                      final response = await askBot(
+                        null,
+                        await file.readAsBytes(),
+                      ).onError(
+                        (error, stackTrace) {
+                          throw Exception(error);
+                        },
+                      );
+
+                      // Add complete response
+                      _chatController.addMessage(
+                        ChatMessage(
+                          text: response,
+                          user: _aiUser,
+                          createdAt: DateTime.now(),
+                          isMarkdown: true,
+                        ),
+                      );
+                    } finally {
+                      setState(() => _isGenerating = false);
+                    }
+                  }
+                },
+              );
+            }
+            return const LinearProgressIndicator();
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -178,6 +232,7 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                         aiUser: _aiUser,
                         controller: _chatController,
                         aiName: 'Print AI',
+
                         onSendMessage: _handleSendMessage,
                         scrollController: _scrollController,
 
@@ -187,6 +242,12 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
                                   ),
+                          textStyle: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(
+                                color: isDark ? Colors.white60 : Colors.black54,
+                              ),
                           timeTextStyle: Theme.of(context)
                               .textTheme
                               .labelSmall
@@ -317,6 +378,9 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           textController: _textController,
+                          keyboardType: TextInputType.text,
+                          maxLines: 1,
+                          textInputAction: TextInputAction.next,
                           sendButtonBuilder: (onSend) {
                             if (_textController.text.isEmpty) {
                               return IconButton(
@@ -324,83 +388,7 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                                   Icons.mic,
                                   color: colorScheme.primary,
                                 ),
-                                onPressed: () async {
-                                  if (_waveController.isRecording) return;
-                                  await _waveController.startRecording();
-                                  showBottomSheet(
-                                    context: context,
-                                    enableDrag: false,
-                                    shape: const RoundedRectangleBorder(),
-                                    constraints: const BoxConstraints(),
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) {
-                                      return AnimatedBuilder(
-                                        animation: _waveController,
-                                        builder: (context, child) {
-                                          if (_waveController.isRecording) {
-                                            return CustomRecorder(
-                                              waveController: _waveController,
-                                              onRecordStopped: () async {
-                                                final file =
-                                                    _waveController.file;
-
-                                                if (file != null) {
-                                                  _chatController.addMessage(
-                                                    ChatMessage(
-                                                      text: '*Audio*',
-                                                      isMarkdown: true,
-                                                      user: _currentUser,
-                                                      createdAt: DateTime.now(),
-                                                      media: [
-                                                        ChatMedia(
-                                                          url: file.path,
-                                                          type: ChatMediaType
-                                                              .audio,
-                                                        )
-                                                      ],
-                                                    ),
-                                                  );
-
-// Non-streaming approach with loading indicator
-                                                  setState(() =>
-                                                      _isGenerating = true);
-
-                                                  try {
-                                                    // Generate response with delay
-                                                    final response =
-                                                        await askBot(
-                                                      null,
-                                                      await file.readAsBytes(),
-                                                    ).onError(
-                                                      (error, stackTrace) {
-                                                        throw Exception(error);
-                                                      },
-                                                    );
-
-                                                    // Add complete response
-                                                    _chatController.addMessage(
-                                                      ChatMessage(
-                                                        text: response,
-                                                        user: _aiUser,
-                                                        createdAt:
-                                                            DateTime.now(),
-                                                        isMarkdown: true,
-                                                      ),
-                                                    );
-                                                  } finally {
-                                                    setState(() =>
-                                                        _isGenerating = false);
-                                                  }
-                                                }
-                                              },
-                                            );
-                                          }
-                                          return const LinearProgressIndicator();
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
+                                onPressed: () => _handleAudioMessage(context),
                               );
                             }
 
@@ -413,7 +401,7 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                             );
                           },
                           decoration: InputDecoration(
-                            hintText: 'Ask me anything...',
+                            hintText: 'Pregunta lo que necesites...',
                             border: InputBorder.none,
                             filled: true,
                             fillColor: advancedTheme.inputBackground,
@@ -436,6 +424,11 @@ class _AdvancedChatScreenState extends State<AdvancedChatScreen> {
                         // Pagination configuration
                         paginationConfig: const PaginationConfig(
                           enabled: true,
+                        ),
+
+                        welcomeMessageConfig: const WelcomeMessageConfig(
+                          title: 'PrintAI',
+                          questionsSectionTitle: 'Soy el agente definitivo para mantenerte informado y proveerte libros. ¿Cómo puedo servirte?'
                         ),
                       ),
                     ),
@@ -516,7 +509,7 @@ class CustomRecorder extends StatelessWidget {
                       color: colorScheme.primary,
                     ),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
                       _waveController.cancelRecording();
                     },
                   )

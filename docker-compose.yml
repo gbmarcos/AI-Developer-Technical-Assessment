@@ -85,7 +85,7 @@ services:
       - N8N_BASIC_AUTH_PASSWORD=admin
       - N8N_HOST=n8n
       - N8N_PORT=5678
-      - N8N_ENCRYPTION_KEY=n8necryptionkey
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - REDIS_HOST=recruiter-dev-redis
       - REDIS_PORT=6379
       - N8N_SECURE_COOKIE=false

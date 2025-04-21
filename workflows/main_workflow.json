@@ -81,7 +81,7 @@
       "name": "DeepSeek Chat Model",
       "credentials": {
         "deepSeekApi": {
-          "id": "G6uyLmjc0ASX6w30",
+          "id": "Uko5dRAZPTOWRZSK",
           "name": "DeepSeek account"
         }
       }
@@ -255,7 +255,7 @@
       "name": "upload file1",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "x8lwanUpS0l0apjD",
+          "id": "16kclBYNXZS6UWIP",
           "name": "Header Auth account"
         }
       }
@@ -291,12 +291,12 @@
       "name": "Start transcription1",
       "credentials": {
         "deepSeekApi": {
-          "id": "G6uyLmjc0ASX6w30",
+          "id": "Uko5dRAZPTOWRZSK",
           "name": "DeepSeek account"
         },
         "httpHeaderAuth": {
-          "id": "x8lwanUpS0l0apjD",
-          "name": "Header Auth account"
+          "id": "16kclBYNXZS6UWIP",
+          "name": "Assambly"
         }
       }
     },
@@ -345,8 +345,8 @@
       "name": "Request trascription1",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "x8lwanUpS0l0apjD",
-          "name": "Assembly Credential"
+          "id": "16kclBYNXZS6UWIP",
+          "name": "Header Auth account"
         }
       }
     },
@@ -580,10 +580,10 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "M5s4CzI6hwYqSf01"
   },
-  "versionId": "13cce2cc-ad6e-42e2-a2e7-a634b29d76de",
+  "versionId": "86c9e2ed-cab2-45b0-b506-d23394910c7c",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "e03ea6ff8c6317467de457c640530f91278abc939a03179cf782ab09eb17a436"
+    "instanceId": "b20dfa826042f377f0e29556b15c4f22bdadce339dac26fe7cb00880784ad251"
   },
   "id": "M5s4CzI6hwYqSf01",
   "tags": []
