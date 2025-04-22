@@ -7,7 +7,7 @@ router = APIRouter()
 @router.post("/init")
 async def init_scrape():
     try:
-        scrape_books()  # Asume que esta función aún no es async
-        return {"message": "Scraping iniciado"}
+        scrape_books()  
+        return {"message": "Scrapping started"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al iniciar scraping: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error starting scraping: {str(e)}")

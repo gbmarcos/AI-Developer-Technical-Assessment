@@ -54,7 +54,7 @@ services:
     depends_on:
       - n8n
     volumes:
-      - ./frontend:/app  # Montar solo la subcarpeta para desarrollo
+      - ./frontend:/app  
       - /app/node_modules
 
   n8n:

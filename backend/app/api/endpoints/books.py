@@ -22,7 +22,7 @@ async def search_books(query: str = ""):
                 books.append(data)
         return books
     except redis.exceptions.RedisError as e:
-        raise HTTPException(status_code=503, detail="Error con Redis: " + str(e))
+        raise HTTPException(status_code=503, detail="Redis error: " + str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -36,6 +36,6 @@ async def get_books(category: str = ""):
                 books.append(data)
         return books
     except redis.exceptions.RedisError as e:
-        raise HTTPException(status_code=503, detail="Error con Redis: " + str(e))
+        raise HTTPException(status_code=503, detail="Redis error: " + str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

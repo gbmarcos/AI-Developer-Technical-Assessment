@@ -8,7 +8,7 @@ import hashlib
 import logging
 import time
 
-# Configuración de logging
+# logging config
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -30,7 +30,7 @@ def get_book_category(detail_url):
         if len(breadcrumb_links) >= 3:
             return breadcrumb_links[2].text.strip()
     except Exception as e:
-        logging.warning(f"No se pudo obtener la categoría para {detail_url}: {e}")
+        logging.warning(f"Category not found for {detail_url}: {e}")
     return "Unknown"
 
 def scrape_books():
@@ -42,7 +42,7 @@ def scrape_books():
             response = requests.get(BASE_URL.format(page), timeout=10)
             response.raise_for_status()
         except requests.RequestException as e:
-            logging.error(f"Error al obtener la página {page}: {e}")
+            logging.error(f"Error fetching the page {page}: {e}")
             time.sleep(5)
             continue
 
@@ -50,7 +50,7 @@ def scrape_books():
         articles = soup.find_all('article', class_='product_pod')
 
         if not articles:
-            logging.info("No se encontraron más libros.")
+            logging.info("No more books found")
             break
 
         for article in articles:
@@ -82,10 +82,10 @@ def scrape_books():
                     }
                     r.set(f'book:{book_id}', json.dumps(book_data))
                     books_scraped += 1
-                    logging.info(f"✅ Libro almacenado: {title} ({category})")
+                    logging.info(f"✅ Book saved: {title} ({category})")
 
             except Exception as e:
-                logging.error(f"❌ Error procesando libro: {e}")
+                logging.error(f"❌ Error with book: {e}")
                 continue
 
         page += 1

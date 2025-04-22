@@ -5,16 +5,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
 
-# Configurar logging
+# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Configurar el navegador en modo headless
+# Configure navigator in headless mode
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-# Instanciar el driver con WebDriverManager
+# Start driver with WebDriverManager
 driver = webdriver.Chrome(options=options)
 
 def fetch_hacker_news_top_stories(pages=5):
@@ -27,7 +27,7 @@ def fetch_hacker_news_top_stories(pages=5):
 
         try:
             driver.get(url)
-            time.sleep(1)  # Evitar ser bloqueado por el servidor
+            time.sleep(1)  # Avoid server blocking
 
             titles = driver.find_elements(By.CLASS_NAME, "titleline")
             subtexts = driver.find_elements(By.CLASS_NAME, "subtext")
@@ -44,7 +44,7 @@ def fetch_hacker_news_top_stories(pages=5):
                     score_text = score_el.text.split()[0]  # "123 points" → "123"
                     score = int(score_text)
                 except:
-                    score = 0  # En caso de que no tenga votos
+                    score = 0 
 
                 results.append({
                     "title": title,
