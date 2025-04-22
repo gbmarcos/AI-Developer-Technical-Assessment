@@ -44,33 +44,18 @@ services:
 
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend 
     container_name: recruiter-dev-frontend
-    volumes:
-      - ./frontend:/app
-    depends_on:
-      - ngrok
     ports:
-      - "8080:9000"
-    environment:
-      - NGROK_API_URL=http://ngrok:4040/api/tunnels
+      - "8080:80"
     networks:
-        - main-internal-net
-    
-
-  ngrok:
-    image: ngrok/ngrok
+      - main-internal-net
     depends_on:
       - n8n
-    container_name: recruiter-dev-ngrok
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_TOKEN}
-    command:  http n8n:5678 --log=stdout
-    ports:
-      - "4040:4040"
-    networks:
-        - main-internal-net
-    
+    volumes:
+      - ./frontend:/app  # Montar solo la subcarpeta para desarrollo
+      - /app/node_modules
 
   n8n:
     build:
