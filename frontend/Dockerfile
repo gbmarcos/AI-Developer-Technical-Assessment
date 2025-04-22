@@ -1,20 +1,33 @@
-FROM instrumentisto/flutter:3.27.1
+# Etapa de construcción
+FROM node:18-alpine AS build
+
 
 WORKDIR /app
-COPY app/pubspec.yaml .
-RUN flutter pub get
+COPY app/package*.json ./
 
-COPY . .
+RUN npm ci
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    net-tools \
-    curl \
-    jq \
-    python3 \
-    && rm -rf /var/lib/apt/lists/*
+COPY app/ .
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN npm run build
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Etapa de producción con Nginx
+FROM nginx:stable-alpine AS production
+
+# Copiar configuración personalizada de Nginx
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+WORKDIR /usr/share/nginx/
+
+RUN rm -rf html
+RUN mkdir html
+
+WORKDIR /
+
+# Copiar archivos estáticos construidos
+COPY --from=build /app/dist/public /usr/share/nginx/html
+
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
